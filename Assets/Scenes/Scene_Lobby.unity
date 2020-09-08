@@ -731,13 +731,14 @@ MonoBehaviour:
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
-  playerPrefab: {fileID: 2049156596011489664, guid: 86c9460fbfa932b488631fd3bea244f7,
+  playerPrefab: {fileID: 3850731802837715968, guid: 6402f4b836a8d934084085e2df0cd5c7,
     type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
   spawnPrefabs: []
+  minPlayers: 2
   menuScene: Assets/Scenes/Scene_Lobby.unity
-  roomPlayerPrefab: {fileID: 2974438364160055415, guid: 86c9460fbfa932b488631fd3bea244f7,
+  roomPlayerPrefab: {fileID: 5494571419773178487, guid: 5a4dd2903883257408a92b35cfa7ea62,
     type: 3}
 --- !u!114 &2002246450
 MonoBehaviour:
