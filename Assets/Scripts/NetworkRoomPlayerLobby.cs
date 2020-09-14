@@ -125,11 +125,12 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
     [Command]
 
-    public void CmdStarGame ()
+    public void CmdStartGame ()
     {
         if ( Room.RoomPlayers [0].connectionToClient == connectionToClient )
         {
-            //Start Game
+            Room.StartGame ();
         }
+       
     }
 }

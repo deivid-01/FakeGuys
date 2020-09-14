@@ -14,11 +14,17 @@ public class NetworkManagerLobby : NetworkManager
     [Header("Room")]
     [SerializeField] private NetworkRoomPlayerLobby roomPlayerPrefab = null;
 
+    [Header("Game")]
+    [SerializeField] private NetworkGamePlayerLobby gamePlayerPrefab = null;
+    [Scene] [SerializeField ] private string gameScene = string.Empty;
+
+
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
 
 
     public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby> ();
+    public List<NetworkGamePlayerLobby> GamePlayers { get; } = new List<NetworkGamePlayerLobby> ();
 
     #region Load From "resources" folder all game objects
     public override void OnStartServer ()
@@ -109,7 +115,7 @@ public class NetworkManagerLobby : NetworkManager
 
     private bool IsReadyToStart ()
     {
-        if ( numPlayers > minPlayers )
+        if ( numPlayers >= minPlayers )
         {
             foreach ( var player in RoomPlayers )
             {
@@ -124,4 +130,38 @@ public class NetworkManagerLobby : NetworkManager
         return false;
     }
 
+
+    public void StartGame ()
+    {
+        if ( "Assets/Scenes/" + SceneManager.GetActiveScene ().name + ".unity" == menuScene )
+        {
+            if ( IsReadyToStart () )
+            {
+                ServerChangeScene ( gameScene );
+            }
+        }
+   
+
+    }
+
+    public override void ServerChangeScene ( string newSceneName )
+    {
+        //From Menu to game
+
+        if ( "Assets/Scenes/" + SceneManager.GetActiveScene ().name + ".unity" == menuScene && newSceneName.StartsWith ( "Assets/Scenes/Scene_Map" ) )
+        {
+            for ( int  i = RoomPlayers.Count -1 ; i >=0  ; i-- )
+            {
+                var conn = RoomPlayers [i].connectionToClient;
+                var   gameplayInstance = Instantiate ( gamePlayerPrefab );
+                gameplayInstance.SetDisplayName ( RoomPlayers [i].DisplayName );
+
+                NetworkServer.Destroy ( conn.identity.gameObject );
+                NetworkServer.ReplacePlayerForConnection ( conn , gameplayInstance.gameObject );
+                Debug.Log ( "oliwis" );
+            }
+        }
+
+        base.ServerChangeScene ( newSceneName );
+    }
 }
