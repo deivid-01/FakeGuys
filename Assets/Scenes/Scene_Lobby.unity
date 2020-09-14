@@ -742,6 +742,8 @@ MonoBehaviour:
     type: 3}
   gamePlayerPrefab: {fileID: 4554099123480510788, guid: d7eb4ccf160c5a04cb8db9082c51d31d,
     type: 3}
+  playerSpawnSystem: {fileID: 2761306617511064235, guid: b40287b16ca82944391b76f89a6a5177,
+    type: 3}
   gameScene: Assets/Scenes/Scene_Map_01.unity
 --- !u!114 &2002246450
 MonoBehaviour:

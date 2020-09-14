@@ -16,11 +16,13 @@ public class NetworkManagerLobby : NetworkManager
 
     [Header("Game")]
     [SerializeField] private NetworkGamePlayerLobby gamePlayerPrefab = null;
+    [SerializeField] private GameObject playerSpawnSystem = null;
     [Scene] [SerializeField ] private string gameScene = string.Empty;
 
 
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
+    public static event Action <NetworkConnection> OnServerReadied;
 
 
     public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby> ();
@@ -157,11 +159,31 @@ public class NetworkManagerLobby : NetworkManager
                 gameplayInstance.SetDisplayName ( RoomPlayers [i].DisplayName );
 
                 NetworkServer.Destroy ( conn.identity.gameObject );
-                NetworkServer.ReplacePlayerForConnection ( conn , gameplayInstance.gameObject );
-                Debug.Log ( "oliwis" );
+                NetworkServer.ReplacePlayerForConnection ( conn , gameplayInstance.gameObject , true );
+   
             }
         }
 
         base.ServerChangeScene ( newSceneName );
     }
+
+
+    public override void OnServerSceneChanged ( string sceneName )
+    {
+        if ( sceneName.StartsWith ( "Assets/Scenes/Scene_Map" ) )
+        {
+            Debug.Log ( "oliwis2.0" );
+            GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
+            NetworkServer.Spawn ( playerSpawnSystemInstance );
+        }
+    }
+
+    public override void OnServerReady ( NetworkConnection conn )
+    {
+        base.OnServerReady ( conn );
+
+        OnServerReadied?.Invoke ( conn );
+    }
+
+
 }
