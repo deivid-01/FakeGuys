@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using TMPro;
 using UnityEngine.UI;
+using Steamworks;
 public class NetworkRoomPlayerLobby : NetworkBehaviour
 {
     [Header("UI")]
@@ -60,6 +61,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         UpdateDisplay ();
     }
 
+   
     public override void OnNetworkDestroy ()
     {
         Room.RoomPlayers.Remove ( this );
@@ -96,8 +98,8 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         {
             playerNameTexts [i].text = Room.RoomPlayers [i].DisplayName;
             playerReadyTexts [i].text = Room.RoomPlayers [i].IsReady ?
-                    "<color=green>Ready</color" :
-                    "<color=red>Not Ready</color";
+                    "<color=green>Ready</color>" :
+                    "<color=red>Not Ready</color>";
         }
     }
 
@@ -133,4 +135,17 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         }
        
     }
+
+    public void InviteFriend ()
+    {
+        SteamFriends.ActivateGameOverlayInviteDialog ( SteamLobby.cSteamIDLobby );
+      
+    }
+
+    public void LeaveLobby ()
+    {
+        SteamMatchmaking.LeaveLobby ( SteamLobby.cSteamIDLobby );
+    }
+
+
 }

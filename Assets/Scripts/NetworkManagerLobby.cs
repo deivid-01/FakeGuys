@@ -7,7 +7,9 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 public class NetworkManagerLobby : NetworkManager
 {
+   
     [Header("Added features")]
+    [Header("------------------------------")]
     [SerializeField] private int minPlayers = 2;
     [Scene] [SerializeField ] private string menuScene = string.Empty;
 
@@ -18,6 +20,7 @@ public class NetworkManagerLobby : NetworkManager
     [SerializeField] private NetworkGamePlayerLobby gamePlayerPrefab = null;
     [SerializeField] private GameObject playerSpawnSystem = null;
     [Scene] [SerializeField ] private string gameScene = string.Empty;
+  
 
 
     public static event Action OnClientConnected;
