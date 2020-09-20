@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Mirror;
+using UnityEngine.Animations;
 
 public class PlayerMovementController : NetworkBehaviour //Belongs to someone
 {
@@ -10,15 +11,16 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
     [Header("Ground Detection ")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float sphereRadius=0.4f; //Minisphere radius to detect collision with ground
-    private bool isGrounded; // If is touching the ground
+    [SerializeField] private bool isGrounded; // If is touching the ground
     [SerializeField] private LayerMask groundMask;
     [Space]
+    [SerializeField] private bool isJumping;
    
     #region Constanst Values
     [Header(" Constant values ")]
     [Range(-10,-50)] public float gravity = -9.81f;
     [Range (0.5f,3)] public float jumpHight=3f;
-    [Range(6,15)] public float speed = 5f;
+    [Range(4,15)] public float speed = 5f;
     #endregion
 
     [SerializeField] private float turnSmoothTime = 0.1f;
@@ -45,6 +47,9 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
         //Ctx are the values readed by Controls ( KeyBoard Input)
         Controls.Player.Move.performed += ctx => SetMovement ( ctx.ReadValue<Vector2> () ); //When performs movememt Calls SetMovement
         Controls.Player.Move.canceled += ctx => ResetMovement ();
+        Controls.Player.Jump.performed += ctx => Jump ();
+        Controls.Player.Jump.canceled += ctx => ResetJump ();
+
     }
 
     [ClientCallback]
@@ -66,11 +71,6 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
 
         isGrounded = Physics.CheckSphere ( groundCheck.position , sphereRadius , groundMask );
 
-        float horizontal = Input.GetAxisRaw ( "Horizontal" );
-        float vertical = Input.GetAxisRaw ( "Vertical" );
-        //Debug.Log ( $"Horizontal {horizontal} | Vertical {vertical}" );
-        //Debug.Log ( $"Previus Input {previousInput}" );
-
         Vector3 direction = new Vector3(previousInput.x,0f,previousInput.y).normalized;
         if ( direction.magnitude >= 0.1f ) //It is moving 
         {
@@ -90,18 +90,23 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
 
         controller.Move ( currentVelocity * Time.deltaTime );
 
-        /*
-        if ( Input.GetButtonDown ( "Jump" ) && isGrounded )
+        
+        if ( isJumping && isGrounded )
         {
             currentVelocity.y = Mathf.Sqrt ( jumpHight * gravity * -2 );
         }
-        */
+        
 
 
 
 
-    } 
-    
+    }
+    [Client]
+    private void Jump () => isJumping = true;
+
+    [Client]
+
+    private void ResetJump () => isJumping = false;
 
     [Client]
     private void SetMovement ( Vector2 movement ) => previousInput = movement;
@@ -122,5 +127,6 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
        controller.Move ( moveDir.normalized * speed * Time.deltaTime );
 
     }
+
 }
 

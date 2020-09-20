@@ -8,9 +8,6 @@ public class PlayerCameraController : NetworkBehaviour
     [Header("Camera")]
       
 
-
-
-
         [SerializeField] private Transform playerTransform = null;
         [SerializeField] private CinemachineFreeLook freeLookCamera = null;
 
