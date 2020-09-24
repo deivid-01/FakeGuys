@@ -8,6 +8,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine.UI;
 using Steamworks;
+[System.Serializable]
 public class NetworkRoomPlayerLobby : NetworkBehaviour
 {
     [Header("UI")]
@@ -62,9 +63,10 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     }
 
    
-    public override void OnNetworkDestroy ()
+    public override void OnStopClient ()
     {
         Room.RoomPlayers.Remove ( this );
+        
 
         UpdateDisplay ();
     }
@@ -145,6 +147,22 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public void LeaveLobby ()
     {
         SteamMatchmaking.LeaveLobby ( SteamLobby.cSteamIDLobby );
+       Destroy ( gameObject );
+    
+        if ( isLeader )
+        {
+            Room.StopHost ();
+        }
+        else
+        {
+            Room.StopClient ();
+            Room.RoomPlayers.Remove ( this );
+            //Room.RoomPlayers.Clear ();
+        }
+
+
+
+
     }
 
 

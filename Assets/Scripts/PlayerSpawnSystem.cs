@@ -24,6 +24,13 @@ public class PlayerSpawnSystem : NetworkBehaviour //Spawned by the server
 
     public override void OnStartServer () => NetworkManagerLobby.OnServerReadied += SpawnPlayer;
 
+    public override void OnStartClient ()
+    {
+        InputManager.Add ( ActionMapNames.Player ); //Block player movement and look
+        InputManager.Controls.Player.Look.Enable (); //Enable look around for the player
+
+    }
+
     [ServerCallback]
 
     private void OnDestroy () => NetworkManagerLobby.OnServerReadied -= SpawnPlayer;

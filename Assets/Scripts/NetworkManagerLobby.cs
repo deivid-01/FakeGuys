@@ -5,6 +5,8 @@ using Mirror;
 using System;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using UnityEngine.UI;
+
 public class NetworkManagerLobby : NetworkManager
 {
    
@@ -13,19 +15,27 @@ public class NetworkManagerLobby : NetworkManager
     [SerializeField] private int minPlayers = 2;
     [Scene] [SerializeField ] private string menuScene = string.Empty;
 
+    [Header("Maps")]
+    [SerializeField] private int numberOfRounds = 1;
+    [SerializeField] private MapSet mapSet= null;
     [Header("Room")]
     [SerializeField] private NetworkRoomPlayerLobby roomPlayerPrefab = null;
 
     [Header("Game")]
     [SerializeField] private NetworkGamePlayerLobby gamePlayerPrefab = null;
     [SerializeField] private GameObject playerSpawnSystem = null;
+    [SerializeField] private GameObject roundSystem = null;
     [Scene] [SerializeField ] private string gameScene = string.Empty;
-  
 
+    public GameObject btn_gameObject;
+    public Text numRoomPlayers;
+
+    private MapHandler mapHandler;
 
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
     public static event Action <NetworkConnection> OnServerReadied;
+    public static event Action OnServerStopped;
 
 
     public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby> ();
@@ -35,8 +45,14 @@ public class NetworkManagerLobby : NetworkManager
     public override void OnStartServer ()
     {
         spawnPrefabs = Resources.LoadAll<GameObject> ( "SpawnablePrefabs" ).ToList ();
+        Debug.Log ( "Server se inició" );
+
     }
 
+    private void Update ()
+    {
+        numRoomPlayers.text = RoomPlayers.Count.ToString();
+    }
     public override void OnStartClient ()
     {
         var spawnablePrefabs = Resources.LoadAll<GameObject> ( "SpawnablePrefabs" );
@@ -45,21 +61,37 @@ public class NetworkManagerLobby : NetworkManager
         {
             ClientScene.RegisterPrefab ( prefab );
         }
+
+        Debug.Log ( "Client Starting" );
+
     }
 
     #endregion
 
     public override void OnClientConnect ( NetworkConnection conn )
     {
+        Debug.Log ( "Cliente se conecto" );
+
         base.OnClientConnect ( conn );
         OnClientConnected?.Invoke ();
+    }
+
+    public override void OnStopClient ()
+    {
+
+
+        Debug.Log ( "Cliente se desconecto OnStopClient" );
+        btn_gameObject.SetActive ( true );
+
+        //base.OnStopClient ();
     }
 
     public override void OnClientDisconnect ( NetworkConnection conn )
     {
         base.OnClientDisconnect ( conn );
-
         OnClientDisconnected?.Invoke ();
+
+
     }
 
     public override void OnServerConnect ( NetworkConnection conn )
@@ -93,6 +125,8 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnServerDisconnect ( NetworkConnection conn )
     {
+       
+
 
         if ( conn.identity != null )
         {
@@ -107,7 +141,10 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnStopServer ()
     {
+        OnServerStopped?.Invoke ();
+
         RoomPlayers.Clear ();
+        GamePlayers.Clear ();
     }
 
     public void NotifyPlayersOfReadyState ()
@@ -142,7 +179,10 @@ public class NetworkManagerLobby : NetworkManager
         {
             if ( IsReadyToStart () )
             {
-                ServerChangeScene ( gameScene );
+
+                mapHandler = new MapHandler ( mapSet , numberOfRounds );
+
+                ServerChangeScene ( mapHandler.NextMap );
             }
         }
    
@@ -175,9 +215,13 @@ public class NetworkManagerLobby : NetworkManager
     {
         if ( sceneName.StartsWith ( "Assets/Scenes/Scene_Map" ) )
         {
-            Debug.Log ( "oliwis2.0" );
+            
             GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
             NetworkServer.Spawn ( playerSpawnSystemInstance );
+
+            //Spawn round system
+            GameObject roundSystemInstance = Instantiate ( roundSystem );
+            NetworkServer.Spawn ( roundSystemInstance );
         }
     }
 

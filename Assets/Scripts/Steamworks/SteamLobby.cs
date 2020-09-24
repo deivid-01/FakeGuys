@@ -16,8 +16,6 @@ public class SteamLobby : MonoBehaviour
     protected Callback<LobbyEnter_t> lobbyEntered;
     protected Callback<GameRichPresenceJoinRequested_t> gameRichPresenceJoinRequested;
 
-    public GameObject test;
-
     public static CSteamID cSteamIDLobby;
 
 
@@ -36,7 +34,6 @@ public class SteamLobby : MonoBehaviour
             lobbyCreated = Callback<LobbyCreated_t>.Create ( OnLobbyCreated );
             gameJoinLobbyRequested = Callback<GameLobbyJoinRequested_t>.Create ( OnGameJoinLobbyRequested );
             lobbyEntered = Callback<LobbyEnter_t>.Create ( OnLobbyEntered );
-            gameRichPresenceJoinRequested = Callback<GameRichPresenceJoinRequested_t>.Create ( OnInvitationAccepted );
         }
     }
     public void HostLobby ()
@@ -53,7 +50,7 @@ public class SteamLobby : MonoBehaviour
             Debug.LogError ( "Fail lobby creation" );
             return;
         }
-
+        networkManager.RoomPlayers.Clear ();
         networkManager.StartHost ();
 
         DisableActualUI ();
@@ -87,6 +84,7 @@ public class SteamLobby : MonoBehaviour
                 HostAddressKey);
             networkManager.networkAddress = hostAddress;
 
+            networkManager.RoomPlayers.Clear ();
 
             networkManager.StartClient ();
 
@@ -97,18 +95,16 @@ public class SteamLobby : MonoBehaviour
 
     }
 
-    private void OnInvitationAccepted ( GameRichPresenceJoinRequested_t callback )
-    {
 
-        //SteamMatchmaking.JoinLobby ( callback.m_steamIDLobby );
-        test.SetActive ( true );
-
-    }
 
     public void DisableActualUI ()
     {
         landingPagePanel.SetActive ( false );
     }
 
+    public void ShowFriends ()
+    {
+        SteamFriends.ActivateGameOverlay ( "Friends" );
+    }
 }
    

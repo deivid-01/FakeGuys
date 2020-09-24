@@ -29,15 +29,6 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
 
     #region Controls Variables 
     private Vector2 previousInput; //???
-    private Controls controls; //Controler
-    private Controls Controls
-    {
-        get
-        {
-            if ( controls != null  ){ return controls; }
-            return controls = new Controls ();
-        }
-    }
 
     #endregion 
     public override void OnStartAuthority ()
@@ -45,25 +36,13 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
         enabled = true;
 
         //Ctx are the values readed by Controls ( KeyBoard Input)
-        Controls.Player.Move.performed += ctx => SetMovement ( ctx.ReadValue<Vector2> () ); //When performs movememt Calls SetMovement
-        Controls.Player.Move.canceled += ctx => ResetMovement ();
-        Controls.Player.Jump.performed += ctx => Jump ();
-        Controls.Player.Jump.canceled += ctx => ResetJump ();
+        InputManager.Controls.Player.Move.performed += ctx => SetMovement ( ctx.ReadValue<Vector2> () ); //When performs movememt Calls SetMovement
+        InputManager.Controls.Player.Move.canceled += ctx => ResetMovement ();
+        InputManager.Controls.Player.Jump.performed += ctx => Jump ();
+        InputManager.Controls.Player.Jump.canceled += ctx => ResetJump ();
 
     }
 
-    [ClientCallback]
-
-    private void OnEnable ()
-    {
-        Controls.Enable ();
-    }
-    [ClientCallback]
-
-    private void OnDisable ()
-    {
-        Controls.Disable ();
-    }
 
     [ClientCallback]
     private void Update ()
