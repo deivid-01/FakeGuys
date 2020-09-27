@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: MapSet
   m_EditorClassIdentifier: 
   maps:
-  - Assets/Scenes/Scene_Map_01.unity
-  - Assets/Scenes/Scene_Map_02.unity
+  - Assets/Scenes/Levels/Scene_Map_01.unity

@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
 using Mirror;
-using UnityEngine.Animations;
-
+using UnityEngine.UI;
 public class PlayerMovementController : NetworkBehaviour //Belongs to someone
 {
-    
+
     [SerializeField] private CharacterController controller = null;
     [SerializeField] private Transform cameraTransform;
     
@@ -27,21 +26,53 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
     float turnSmoothVelocity;
     Vector3 currentVelocity;
 
+    public GameObject canvas;
+    public GameObject qualified;
+    public GameObject eliminated;
+    public GameObject roundOver;
+    public bool isFinished=false;
+
+
     #region Controls Variables 
     private Vector2 previousInput; //???
 
     #endregion 
     public override void OnStartAuthority ()
     {
+
+        Debug.Log ( "olaaaa" );
+        canvas.SetActive ( true );
         enabled = true;
 
-        //Ctx are the values readed by Controls ( KeyBoard Input)
-        InputManager.Controls.Player.Move.performed += ctx => SetMovement ( ctx.ReadValue<Vector2> () ); //When performs movememt Calls SetMovement
+    //Ctx are the values readed by Controls ( KeyBoard Input)
+    InputManager.Controls.Player.Move.performed += ctx => SetMovement ( ctx.ReadValue<Vector2> () ); //When performs movememt Calls SetMovement
         InputManager.Controls.Player.Move.canceled += ctx => ResetMovement ();
         InputManager.Controls.Player.Jump.performed += ctx => Jump ();
         InputManager.Controls.Player.Jump.canceled += ctx => ResetJump ();
 
     }
+
+
+    public void Finished ( bool isFinish )
+    {
+
+        if ( isFinish )
+        {
+
+            isFinished = true;
+            qualified.SetActive ( true );
+
+            //Room.IsRoundOVer ();
+        }
+        else if ( !isFinish )
+        {
+            //ui_eliminated.SetActive ( true );
+        }
+
+        //BLOCK INPUT TO SPECFIIC PLEYER
+
+    }
+
 
 
     [ClientCallback]
@@ -53,7 +84,7 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
         Vector3 direction = new Vector3(previousInput.x,0f,previousInput.y).normalized;
         if ( direction.magnitude >= 0.1f ) //It is moving 
         {
-            Debug.Log  (direction );
+  
             
             Move (direction);
         }

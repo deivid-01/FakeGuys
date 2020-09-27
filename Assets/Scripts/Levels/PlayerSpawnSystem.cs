@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
+using UnityEngine.UI;
 
 public class PlayerSpawnSystem : NetworkBehaviour //Spawned by the server
 {
@@ -11,6 +11,11 @@ public class PlayerSpawnSystem : NetworkBehaviour //Spawned by the server
     private static  List<Transform> spawnPoints = new List<Transform>();
 
     private  int nextIndex = 0;
+
+    public Text[] ids;
+
+
+    int nextIndex2=0;
 
     public static void AddSpawnPoint ( Transform transform )
     {
@@ -26,6 +31,7 @@ public class PlayerSpawnSystem : NetworkBehaviour //Spawned by the server
 
     public override void OnStartClient ()
     {
+      
         InputManager.Add ( ActionMapNames.Player ); //Block player movement and look
         InputManager.Controls.Player.Look.Enable (); //Enable look around for the player
 
@@ -47,7 +53,13 @@ public class PlayerSpawnSystem : NetworkBehaviour //Spawned by the server
             return;
         }
 
+
         GameObject playerInstance  = Instantiate(playerPrefab,spawnPoints[nextIndex].position,spawnPoints[nextIndex].rotation);
+
+
+        playerInstance.GetComponent<PlayerDetection>().id = conn.connectionId;
+
+
         NetworkServer.Spawn ( playerInstance , conn );
 
         nextIndex++;

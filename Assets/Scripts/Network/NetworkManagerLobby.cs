@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using System;
@@ -9,11 +8,12 @@ using UnityEngine.UI;
 
 public class NetworkManagerLobby : NetworkManager
 {
-   
+
     [Header("Added features")]
     [Header("------------------------------")]
     [SerializeField] private int minPlayers = 2;
     [Scene] [SerializeField ] private string menuScene = string.Empty;
+    [SerializeField] private string levelsSceneRoot="Assets/Scenes/Levels/";
 
     [Header("Maps")]
     [SerializeField] private int numberOfRounds = 1;
@@ -25,10 +25,12 @@ public class NetworkManagerLobby : NetworkManager
     [SerializeField] private NetworkGamePlayerLobby gamePlayerPrefab = null;
     [SerializeField] private GameObject playerSpawnSystem = null;
     [SerializeField] private GameObject roundSystem = null;
-    [Scene] [SerializeField ] private string gameScene = string.Empty;
 
-    public GameObject btn_gameObject;
-    public Text numRoomPlayers;
+
+    public Text[] connectionsIds;
+
+
+
 
     private MapHandler mapHandler;
 
@@ -41,6 +43,16 @@ public class NetworkManagerLobby : NetworkManager
     public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby> ();
     public List<NetworkGamePlayerLobby> GamePlayers { get; } = new List<NetworkGamePlayerLobby> ();
 
+
+    private void Update()
+    {
+        for (int i = 0; i < GamePlayers.Count; i++)
+        {
+            connectionsIds[i].text = GamePlayers[i].connectionToClient.connectionId.ToString();
+        }
+    }
+
+
     #region Load From "resources" folder all game objects
     public override void OnStartServer ()
     {
@@ -49,10 +61,7 @@ public class NetworkManagerLobby : NetworkManager
 
     }
 
-    private void Update ()
-    {
-        numRoomPlayers.text = RoomPlayers.Count.ToString();
-    }
+
     public override void OnStartClient ()
     {
         var spawnablePrefabs = Resources.LoadAll<GameObject> ( "SpawnablePrefabs" );
@@ -81,7 +90,7 @@ public class NetworkManagerLobby : NetworkManager
 
 
         Debug.Log ( "Cliente se desconecto OnStopClient" );
-        btn_gameObject.SetActive ( true );
+
 
         //base.OnStopClient ();
     }
@@ -125,7 +134,7 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnServerDisconnect ( NetworkConnection conn )
     {
-       
+
 
 
         if ( conn.identity != null )
@@ -151,11 +160,51 @@ public class NetworkManagerLobby : NetworkManager
     {
         foreach ( var player in RoomPlayers )
         {
-            player.HandleReadyToStart ( IsReadyToStart () );
+            player.HandleReadyToStart ( IsReadyToStartGame () );
         }
     }
 
-    private bool IsReadyToStart ()
+  
+    public void IsRoundOver ()
+    {
+
+        int maxPlayerQualified = GamePlayers.Count - ( ( GamePlayers.Count + 1 ) / 3 );
+
+        int numFinished = ( GamePlayers.FindAll ( x => x.isFinished == true ) ).Count;
+
+        Debug.Log ( "Jugadores que han finalizado " + numFinished );
+        Debug.Log ( "maxPLayerQuealified " + maxPlayerQualified );
+
+       // if ( numFinished == maxPlayerQualified ) //Round is over
+        
+            NotifyEliminatedPlayers ();
+
+            NotifyRoundIsOver ();
+        
+    }
+
+    public void NotifyRoundIsOver ()
+    {
+        foreach ( var player in GamePlayers )
+        {
+            player.RpcRoundIsOver ();
+        }
+    }
+
+    private void NotifyEliminatedPlayers ()
+    {
+        foreach ( var player in GamePlayers )
+        {
+            if ( !player.isFinished )
+            {
+               player.TargetUnFinished(player.connectionToClient);
+            }
+        }
+
+    }
+
+
+    private bool IsReadyToStartGame ()
     {
         if ( numPlayers >= minPlayers )
         {
@@ -177,7 +226,7 @@ public class NetworkManagerLobby : NetworkManager
     {
         if ( "Assets/Scenes/" + SceneManager.GetActiveScene ().name + ".unity" == menuScene )
         {
-            if ( IsReadyToStart () )
+            if ( IsReadyToStartGame () )
             {
 
                 mapHandler = new MapHandler ( mapSet , numberOfRounds );
@@ -185,7 +234,7 @@ public class NetworkManagerLobby : NetworkManager
                 ServerChangeScene ( mapHandler.NextMap );
             }
         }
-   
+
 
     }
 
@@ -193,17 +242,17 @@ public class NetworkManagerLobby : NetworkManager
     {
         //From Menu to game
 
-        if ( "Assets/Scenes/" + SceneManager.GetActiveScene ().name + ".unity" == menuScene && newSceneName.StartsWith ( "Assets/Scenes/Scene_Map" ) )
+        if ( "Assets/Scenes/" + SceneManager.GetActiveScene ().name + ".unity" == menuScene && newSceneName.StartsWith ( levelsSceneRoot + "Scene_Map" ) )
         {
-            for ( int  i = RoomPlayers.Count -1 ; i >=0  ; i-- )
+            for ( int i = RoomPlayers.Count - 1 ;i >= 0 ;i-- )
             {
                 var conn = RoomPlayers [i].connectionToClient;
-                var   gameplayInstance = Instantiate ( gamePlayerPrefab );
+                var gameplayInstance = Instantiate ( gamePlayerPrefab );
                 gameplayInstance.SetDisplayName ( RoomPlayers [i].DisplayName );
 
                 NetworkServer.Destroy ( conn.identity.gameObject );
                 NetworkServer.ReplacePlayerForConnection ( conn , gameplayInstance.gameObject , true );
-   
+
             }
         }
 
@@ -213,10 +262,10 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnServerSceneChanged ( string sceneName )
     {
-        if ( sceneName.StartsWith ( "Assets/Scenes/Scene_Map" ) )
+        if ( sceneName.StartsWith ( levelsSceneRoot + "Scene_Map" ) )
         {
-            
-            GameObject playerSpawnSystemInstance = Instantiate(playerSpawnSystem);
+
+            GameObject playerSpawnSystemInstance = Instantiate ( playerSpawnSystem );
             NetworkServer.Spawn ( playerSpawnSystemInstance );
 
             //Spawn round system

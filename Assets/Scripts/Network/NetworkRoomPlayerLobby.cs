@@ -123,7 +123,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     public void CmdReadyUp ()
     {
         IsReady = !IsReady;
-
+        
         Room.NotifyPlayersOfReadyState ();
     }
 
