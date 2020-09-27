@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Mirror;
-using UnityEngine.UI;
 public class PlayerMovementController : NetworkBehaviour //Belongs to someone
 {
 
@@ -26,13 +25,6 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
     float turnSmoothVelocity;
     Vector3 currentVelocity;
 
-    public GameObject canvas;
-    public GameObject qualified;
-    public GameObject eliminated;
-    public GameObject roundOver;
-    public bool isFinished=false;
-
-
     #region Controls Variables 
     private Vector2 previousInput; //???
 
@@ -40,8 +32,7 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
     public override void OnStartAuthority ()
     {
 
-        Debug.Log ( "olaaaa" );
-        canvas.SetActive ( true );
+
         enabled = true;
 
     //Ctx are the values readed by Controls ( KeyBoard Input)
@@ -52,26 +43,6 @@ public class PlayerMovementController : NetworkBehaviour //Belongs to someone
 
     }
 
-
-    public void Finished ( bool isFinish )
-    {
-
-        if ( isFinish )
-        {
-
-            isFinished = true;
-            qualified.SetActive ( true );
-
-            //Room.IsRoundOVer ();
-        }
-        else if ( !isFinish )
-        {
-            //ui_eliminated.SetActive ( true );
-        }
-
-        //BLOCK INPUT TO SPECFIIC PLEYER
-
-    }
 
 
 

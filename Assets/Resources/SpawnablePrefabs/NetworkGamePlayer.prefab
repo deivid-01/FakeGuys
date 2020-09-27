@@ -67,7 +67,6 @@ MonoBehaviour:
   ui_eliminated: {fileID: 6471226709405456534}
   ui_roundOver: {fileID: 5558485130428231238}
   canvasUI: {fileID: 7611508690708134118}
-  id: {fileID: 0}
   isFinished: 0
 --- !u!1 &1645424263742982939
 GameObject:

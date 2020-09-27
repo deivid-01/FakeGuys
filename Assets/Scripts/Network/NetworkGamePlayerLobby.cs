@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 using Mirror;
-using UnityEngine.UI;
 public class NetworkGamePlayerLobby : NetworkBehaviour
 {
     [SyncVar]
@@ -16,10 +15,6 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
 
     [SerializeField] private  GameObject canvasUI=null;
 
-
-    [SerializeField] private  Text  id=null;
-
-    
 
     public bool isFinished=false;
 
@@ -41,7 +36,7 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     {
         canvasUI.SetActive ( true );
         isFinished = false;
-        id.text = this.connectionToClient.connectionId.ToString();
+
     }
 
 
@@ -80,17 +75,12 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     [ClientRpc]
     public void RpcRoundIsOver ()
     {
-        StartCoroutine ( DisplayMessage ( ui_roundOver ) );
-    }
-
-    public IEnumerator DisplayMessage ( GameObject msg )
-    {
-        yield return new WaitForSeconds ( 3 );
-        ui_eliminated.SetActive ( false );
-        ui_qualified.SetActive ( false );
-        msg.SetActive ( true );
+        ui_eliminated.SetActive(false);
+        ui_qualified.SetActive(false);
+        ui_roundOver.SetActive(true);
 
     }
+
 
     [TargetRpc]
 
