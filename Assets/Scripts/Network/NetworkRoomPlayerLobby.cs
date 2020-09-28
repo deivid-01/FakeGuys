@@ -17,6 +17,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     [SerializeField] private TMP_Text[] playerReadyTexts = new TMP_Text[4];
     [SerializeField] private Button startGameButton = null;
 
+
     [SyncVar(hook = nameof(HanldeDisplayNameChanged))]
     public string DisplayName ="Loading...";
     [SyncVar ( hook = nameof ( HandleReadyStatusChanged ) )]
@@ -59,7 +60,8 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     {
         Room.RoomPlayers.Add(this);
 
-        UpdateDisplay ();
+
+        RpcUpdateDisplay ();
     }
 
    
@@ -68,14 +70,24 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         Room.RoomPlayers.Remove ( this );
         
 
-        UpdateDisplay ();
+        RpcUpdateDisplay ();
     }
 
-    public void HandleReadyStatusChanged ( bool oldValue , bool newValue ) => UpdateDisplay ();
+    [Server]
 
-    public void HanldeDisplayNameChanged ( string oldValue , string newValue ) => UpdateDisplay ();
+    public void SetDisplayName(string displayName)
+    {
+        DisplayName= displayName;
+    }
 
-    private void UpdateDisplay ()
+
+
+    public void HandleReadyStatusChanged ( bool oldValue , bool newValue ) => RpcUpdateDisplay ();
+
+    public void HanldeDisplayNameChanged ( string oldValue , string newValue ) => RpcUpdateDisplay ();
+
+
+    private void RpcUpdateDisplay ()
     {
         if ( !hasAuthority )
         {
@@ -83,7 +95,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
             {
                 if ( player.hasAuthority )
                 {
-                    player.UpdateDisplay ();
+                    player.RpcUpdateDisplay ();
                     break;
                 }
             }

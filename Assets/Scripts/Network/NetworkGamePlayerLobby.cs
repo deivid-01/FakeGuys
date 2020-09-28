@@ -1,16 +1,19 @@
 ﻿using System.Collections;
 using UnityEngine;
 using Mirror;
+using TMPro;
 public class NetworkGamePlayerLobby : NetworkBehaviour
 {
     [SyncVar]
-    private string displayName ="Loading...";
+    public string displayName ="Loading...";
 
 
     [Header("UI")]
     [SerializeField] private GameObject ui_qualified = null;
     [SerializeField] private GameObject ui_eliminated = null;
     [SerializeField] private GameObject ui_roundOver = null;
+    [SerializeField] private GameObject ui_winner = null;
+    [SerializeField] private TMP_Text textWinner = null;
 
 
     [SerializeField] private  GameObject canvasUI=null;
@@ -87,6 +90,9 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     public void TargetFinished(NetworkConnection target)
     {
         ui_qualified.SetActive(true);
+
+        Room.playerWinner = displayName;
+
         isFinished = true;
       
     }
@@ -97,5 +103,11 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
         ui_eliminated.SetActive(true);
         isFinished = false;
   
+    }
+    [ClientRpc]
+    public void RpcShowWinner(string nameWinner)
+    {
+        textWinner.text = nameWinner;
+        ui_winner.SetActive(true);
     }
 }

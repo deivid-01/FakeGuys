@@ -4,7 +4,7 @@ using Mirror;
 using System;
 using UnityEngine.SceneManagement;
 using System.Linq;
-using UnityEngine.UI;
+using TMPro;
 using System.Collections;
 
 public class NetworkManagerLobby : NetworkManager
@@ -29,21 +29,21 @@ public class NetworkManagerLobby : NetworkManager
 
 
 
-
-
     private MapHandler mapHandler;
 
     public static event Action OnClientConnected;
     public static event Action OnClientDisconnected;
     public static event Action<NetworkConnection> OnServerReadied;
     public static event Action OnServerStopped;
-    public static event Action OnRoundOver;
+
+
 
     public List<NetworkRoomPlayerLobby> RoomPlayers { get; } = new List<NetworkRoomPlayerLobby>();
     public List<NetworkGamePlayerLobby> GamePlayers { get; } = new List<NetworkGamePlayerLobby>();
 
+    public bool enableMenuUI=true;
 
-
+    public string playerWinner;
 
     #region Load From "resources" folder all game objects
     public override void OnStartServer()
@@ -71,23 +71,18 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnClientConnect(NetworkConnection conn)
     {
-   
+
 
         base.OnClientConnect(conn);
         OnClientConnected?.Invoke();
     }
 
-    public  void ShowWinner()
-    {
-
-        OnRoundOver?.Invoke();
-    }
 
 
     public override void OnStopClient()
     {
 
-     //base.OnStopClient ();
+        //base.OnStopClient ();
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
@@ -124,6 +119,8 @@ public class NetworkManagerLobby : NetworkManager
             roomPlayerInstance.IsLeader = isLeader;
 
             NetworkServer.AddPlayerForConnection(conn, roomPlayerInstance.gameObject);
+
+            Debug.Log("oliwis perro");
         }
     }
 
@@ -167,11 +164,26 @@ public class NetworkManagerLobby : NetworkManager
     IEnumerator NotifyRoundOver()
     {
         NotifyEliminatedPlayers();
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(3f);
         NotifyRoundIsOver();
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
         ShowWinner();
+        yield return new WaitForSeconds(10f);
+        ServerChangeScene(menuScene);
+
+
     }
+
+    public void ShowWinner()
+    {
+        foreach (var player in GamePlayers)
+        {
+            player.RpcShowWinner(playerWinner);
+        }
+    }
+
+  
+
 
     public void NotifyRoundIsOver()
     {
@@ -240,8 +252,26 @@ public class NetworkManagerLobby : NetworkManager
                 var gameplayInstance = Instantiate(gamePlayerPrefab);
                 gameplayInstance.SetDisplayName(RoomPlayers[i].DisplayName);
 
+
+
                 NetworkServer.Destroy(conn.identity.gameObject);
                 NetworkServer.ReplacePlayerForConnection(conn, gameplayInstance.gameObject, true);
+
+            }
+        }
+        else if (newSceneName == menuScene)
+        {
+           //RoomPlayers.Clear();
+            for (int i = GamePlayers.Count - 1; i >= 0; i--)
+            {
+                var conn = GamePlayers[i].connectionToClient;
+                var roomPlayerInstance = Instantiate(roomPlayerPrefab);
+                roomPlayerInstance.SetDisplayName(GamePlayers[i].displayName);
+
+
+
+                NetworkServer.Destroy(conn.identity.gameObject);
+              //  NetworkServer.ReplacePlayerForConnection(conn, roomPlayerInstance.gameObject, true);
 
             }
         }
@@ -262,7 +292,10 @@ public class NetworkManagerLobby : NetworkManager
             GameObject roundSystemInstance = Instantiate(roundSystem);
             NetworkServer.Spawn(roundSystemInstance);
         }
+
+
     }
+
 
     public override void OnServerReady(NetworkConnection conn)
     {
