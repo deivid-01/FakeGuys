@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maps:
   - Assets/Scenes/Levels/Scene_Map_01.unity
+  - Assets/Scenes/Levels/Scene_Map_02.unity

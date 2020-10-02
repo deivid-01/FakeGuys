@@ -16,7 +16,7 @@ public class SteamLobby : MonoBehaviour
     protected Callback<LobbyEnter_t> lobbyEntered;
     protected Callback<GameRichPresenceJoinRequested_t> gameRichPresenceJoinRequested;
 
-    public static CSteamID cSteamIDLobby;
+    public static CSteamID cSteamIDLobby { get; private set; }
 
 
 
@@ -50,6 +50,12 @@ public class SteamLobby : MonoBehaviour
             Debug.LogError ( "Fail lobby creation" );
             return;
         }
+
+
+
+
+
+
         networkManager.RoomPlayers.Clear ();
         networkManager.StartHost ();
 

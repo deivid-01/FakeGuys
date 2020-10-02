@@ -4,10 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Mirror;
-public class PlayerNameInput : MonoBehaviour // Class to set player name
+public class PlayerNameInput : NetworkBehaviour // Class to set player name
 {
     [Header("UI")]
-    [SerializeField] private TMP_InputField nameInputField = null; //Set the name
+    [SerializeField] private TMP_InputField displayNameText = null; //Set the name
     [SerializeField] private Button continueButton = null;
 
 
@@ -36,7 +36,7 @@ public class PlayerNameInput : MonoBehaviour // Class to set player name
     }
 
     public void SavePlayerName () {
-        DisplayName = nameInputField.text;
+        DisplayName = displayNameText.text;
 
     }
 }

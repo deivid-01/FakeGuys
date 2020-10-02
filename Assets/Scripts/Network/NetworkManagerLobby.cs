@@ -4,9 +4,8 @@ using Mirror;
 using System;
 using UnityEngine.SceneManagement;
 using System.Linq;
-using TMPro;
 using System.Collections;
-
+using Steamworks;
 public class NetworkManagerLobby : NetworkManager
 {
 
@@ -27,6 +26,7 @@ public class NetworkManagerLobby : NetworkManager
     [SerializeField] private GameObject playerSpawnSystem = null;
     [SerializeField] private GameObject roundSystem = null;
 
+    public PlayerInfoDisplay playerInfoDisplay;
 
 
     private MapHandler mapHandler;
@@ -56,6 +56,8 @@ public class NetworkManagerLobby : NetworkManager
 
     public override void OnStartClient()
     {
+       
+
         var spawnablePrefabs = Resources.LoadAll<GameObject>("SpawnablePrefabs");
 
         foreach (var prefab in spawnablePrefabs)
@@ -120,7 +122,16 @@ public class NetworkManagerLobby : NetworkManager
 
             NetworkServer.AddPlayerForConnection(conn, roomPlayerInstance.gameObject);
 
-            Debug.Log("oliwis perro");
+            #region Steam configuration
+
+            CSteamID steamId = SteamMatchmaking.GetLobbyMemberByIndex(SteamLobby.cSteamIDLobby, numPlayers - 1); //Grab id from steam
+
+
+            var playerInfoDisplay = conn.identity.GetComponent<PlayerInfoDisplay>(); //grab the component of that game object
+
+            playerInfoDisplay.SetSteamId(steamId.m_SteamID); //Sets id
+
+            #endregion 
         }
     }
 
@@ -250,7 +261,7 @@ public class NetworkManagerLobby : NetworkManager
             {
                 var conn = RoomPlayers[i].connectionToClient;
                 var gameplayInstance = Instantiate(gamePlayerPrefab);
-                gameplayInstance.SetDisplayName(RoomPlayers[i].DisplayName);
+                gameplayInstance.SetDisplayName(RoomPlayers[i].playerInfoDisplay.displayNameText);
 
 
 
@@ -266,8 +277,7 @@ public class NetworkManagerLobby : NetworkManager
             {
                 var conn = GamePlayers[i].connectionToClient;
                 var roomPlayerInstance = Instantiate(roomPlayerPrefab);
-                roomPlayerInstance.SetDisplayName(GamePlayers[i].displayName);
-
+                
 
 
                 NetworkServer.Destroy(conn.identity.gameObject);

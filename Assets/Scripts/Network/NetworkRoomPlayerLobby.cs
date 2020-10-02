@@ -13,10 +13,13 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 {
     [Header("UI")]
     [SerializeField] private GameObject lobbyUI = null;
+    [SerializeField] private RawImage[] playerImages = new RawImage[4];
     [SerializeField] private TMP_Text[] playerNameTexts = new TMP_Text[4];
     [SerializeField] private TMP_Text[] playerReadyTexts = new TMP_Text[4];
     [SerializeField] private Button startGameButton = null;
 
+
+    public PlayerInfoDisplay playerInfoDisplay;
 
     [SyncVar(hook = nameof(HanldeDisplayNameChanged))]
     public string DisplayName ="Loading...";
@@ -49,6 +52,9 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         }
     }
 
+
+
+
     public override void OnStartAuthority ()
     {
         CmdSetDisplayName ( PlayerNameInput.DisplayName );
@@ -60,6 +66,8 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
     {
         Room.RoomPlayers.Add(this);
 
+        playerInfoDisplay = this.GetComponent<PlayerInfoDisplay>();
+   
 
         RpcUpdateDisplay ();
     }
@@ -73,12 +81,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         RpcUpdateDisplay ();
     }
 
-    [Server]
 
-    public void SetDisplayName(string displayName)
-    {
-        DisplayName= displayName;
-    }
 
 
 
@@ -110,7 +113,8 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
         for ( int i = 0 ;i < Room.RoomPlayers.Count ; i++ )
         {
-            playerNameTexts [i].text = Room.RoomPlayers [i].DisplayName;
+            playerImages[i].texture = Room.RoomPlayers[i].playerInfoDisplay.profileImage;
+            playerNameTexts[i].text = Room.RoomPlayers [i].playerInfoDisplay.displayNameText;
             playerReadyTexts [i].text = Room.RoomPlayers [i].IsReady ?
                     "<color=green>Ready</color>" :
                     "<color=red>Not Ready</color>";

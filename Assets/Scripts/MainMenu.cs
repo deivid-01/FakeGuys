@@ -25,7 +25,6 @@ public class MainMenu : MonoBehaviour
     {
         panelName = this.transform.GetChild(1).gameObject;
 
-        Debug.Log(Room.enableMenuUI);
 
         if (Room.enableMenuUI)
         {

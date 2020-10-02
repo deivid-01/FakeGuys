@@ -8,9 +8,9 @@ public class WallsMovement : MonoBehaviour
    [SerializeField] private  Collider groundCollider;
     [Range(0,10)]
     [SerializeField] private  float speed = 1 ;
-    [Range(0,10)]
-    [SerializeField] private float boundaryUp=4;
-    [SerializeField] private float boundaryDown=2;
+    [Range(0, 10)]
+    [SerializeField] private float boundaryUp;
+    [SerializeField] private float boundaryDown;
 
     Vector3 initialPosition;
     [SerializeField] private bool upMove;
