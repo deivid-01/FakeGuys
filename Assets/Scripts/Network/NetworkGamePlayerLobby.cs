@@ -89,6 +89,11 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
 
     public void TargetFinished(NetworkConnection target)
     {
+        InputManager.Add(ActionMapNames.Player); //Block player movement and look
+        InputManager.Controls.Player.Look.Enable(); //Enable look around for the player
+
+
+
         ui_qualified.SetActive(true);
 
         Room.playerWinner = displayName;
@@ -100,6 +105,9 @@ public class NetworkGamePlayerLobby : NetworkBehaviour
     [TargetRpc]
     public void TargetUnFinished(NetworkConnection target)
     {
+        InputManager.Add(ActionMapNames.Player); //Block player movement and look
+
+
         ui_eliminated.SetActive(true);
         isFinished = false;
   

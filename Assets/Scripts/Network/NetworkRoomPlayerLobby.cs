@@ -21,8 +21,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
     public PlayerInfoDisplay playerInfoDisplay;
 
-    [SyncVar(hook = nameof(HanldeDisplayNameChanged))]
-    public string DisplayName ="Loading...";
+ 
     [SyncVar ( hook = nameof ( HandleReadyStatusChanged ) )]
 
     public bool IsReady = false;
@@ -57,7 +56,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
     public override void OnStartAuthority ()
     {
-        CmdSetDisplayName ( PlayerNameInput.DisplayName );
+       
 
         lobbyUI.SetActive ( true );
     }
@@ -87,7 +86,6 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
 
     public void HandleReadyStatusChanged ( bool oldValue , bool newValue ) => RpcUpdateDisplay ();
 
-    public void HanldeDisplayNameChanged ( string oldValue , string newValue ) => RpcUpdateDisplay ();
 
 
     private void RpcUpdateDisplay ()
@@ -129,12 +127,7 @@ public class NetworkRoomPlayerLobby : NetworkBehaviour
         }
     }
 
-    [Command]
-    private void CmdSetDisplayName ( string displayName )
-    {
-        DisplayName = displayName;
-    }
-
+ 
     [Command]
     public void CmdReadyUp ()
     {

@@ -47,7 +47,7 @@ public class InputManager : MonoBehaviour
         UpdateMapState ( mapName );
     }
 
-    public static void Remove ( string mapName ) //Add something to be block
+    public static void Remove ( string mapName ) //Add something to be unlock
     {
         mapStates.TryGetValue ( mapName , out int value );
         mapStates [mapName] = Mathf.Max ( value - 1 , 0 );
